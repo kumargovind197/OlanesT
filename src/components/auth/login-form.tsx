@@ -19,7 +19,7 @@ import { useAuth } from "@/context/auth-context";
 import { useRouter } from "next/navigation";
 import Link from 'next/link';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import app from "@/firebase/config";
+import { app } from "@/firebase/config";
 
 export function LoginForm() {
   const { t } = useI18n();

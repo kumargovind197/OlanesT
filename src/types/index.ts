@@ -11,7 +11,10 @@ export interface UserProfile {
 
 export interface Review {
   id: string;
+    reviewerId: string; // ✅ Add this line
+reviewerEmail: string
   reviewerName: string;
+   contractorId: string;
   revieweeId: string; // The ID of the contractor being reviewed
   rating: number; // e.g., 4.5
   title: string;
@@ -19,12 +22,13 @@ export interface Review {
   createdAt: string; // ISO date string
   contractorComment?: string;
 }
-
 export interface Contractor {
   id: string;
   name: string;
   email: string;
-  location: string; // e.g., "Toronto, ON"
+  city: string;             // ✅ ADD
+  province: string;         // ✅ ADD
+  location?: string;        // keep this optional if still used elsewhere
   serviceCategories: ServiceCategory[];
   bio?: string;
   profilePictureUrl?: string;
@@ -42,6 +46,7 @@ export interface Contractor {
     instagram?: string;
   };
 }
+
 
 export interface LicenseApplication {
   id: string;

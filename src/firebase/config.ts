@@ -1,18 +1,20 @@
 // firebase/config.ts
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { getDocs, getFirestore,} from "firebase/firestore";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyC0Rwi0JVUnpyietFnNCdh_-pG0kySHlJM",
-  authDomain: "olanest.firebaseapp.com",
-  databaseURL: "https://olanest-default-rtdb.firebaseio.com",
-  projectId: "olanest",
-  storageBucket: "olanest.firebasestorage.app",
-  messagingSenderId: "679069537292",
-  appId: "1:679069537292:web:865bf6a065215b5ca38a29"
+  apiKey: "AIzaSyBcDVJIRTYNN3rnWaCNeaNAbEGabzCAa54",
+  authDomain: "olanest-caecd.firebaseapp.com",
+  databaseURL: "https://olanest-caecd-default-rtdb.firebaseio.com",
+  projectId: "olanest-caecd",
+  storageBucket: "olanest-caecd.firebasestorage.app",
+  messagingSenderId: "962424488918",
+  appId: "1:962424488918:web:e58a77a9ba95ae6d7b1a77",
+  measurementId: "G-YDWVC05LMH"
 };
-
 export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
+export {getDocs}
+export {onAuthStateChanged}

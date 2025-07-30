@@ -1,3 +1,4 @@
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,20 +12,48 @@ import Link from "next/link";
 import { ContractorProfileClient } from "@/components/contractor/ContractorProfileClient";
 import { WriteReview } from "@/components/review/WriteReview";
 import { Separator } from "@/components/ui/separator";
-
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/firebase/config";
 // This function would typically fetch data from a database
 async function getContractorData(id: string): Promise<Contractor | null> {
-  await new Promise(resolve => setTimeout(resolve, 200)); // Simulate API delay
-  const contractor = mockContractors.find(c => c.id === id);
-  if (contractor) {
-    return {
-      ...contractor,
-      reviews: mockReviews.filter(r => r.revieweeId === id)
-    };
-  }
-  return null;
-}
+  try {
+    const docRef = doc(db, "users", id);
+    const snapshot = await getDoc(docRef);
 
+    if (!snapshot.exists()) {
+      return null;
+    }
+
+    const data = snapshot.data();
+
+    const contractor: Contractor = {
+      id: snapshot.id,
+      name: data.name || "",
+      email: data.email || "",
+      serviceCategories: data.serviceCategories || [],
+      city: data.city || "",
+      province: data.province || "",
+      location: data.location || "",
+      bio: data.bio || "",
+      profilePictureUrl: data.profilePictureUrl || "",
+      profilePictureStatus: data.profilePictureStatus || "approved",
+      averageRating: data.averageRating || 0,
+      reviews: mockReviews.filter(r => r.revieweeId === snapshot.id), // ✅ Mock reviews
+      languagePreferences: data.languagePreferences || [],
+      licenseNumber: data.licenseNumber || "",
+      isLicenseApproved: data.isLicenseApproved || false,
+      availability: data.availability || "",
+      phone: data.phone || "",
+      website: data.website || "",
+      socialLinks: data.socialLinks || {},
+    };
+
+    return contractor;
+  } catch (error) {
+    console.error("Error fetching contractor:", error);
+    return null;
+  }
+}
 async function checkInitialFavoriteStatus(contractorId: string): Promise<boolean> {
   // In a real app, you would check the logged-in user's favorites from a database
   console.log(`Checking favorite status for ${contractorId}`);

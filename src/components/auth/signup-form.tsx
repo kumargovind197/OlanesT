@@ -62,6 +62,7 @@ export function SignupForm() {
       await setDoc(doc(db, "users", user.uid), {
         fullName: data.fullName,
         email: data.email,
+        password:data.password,
         role: data.role,
       });
 

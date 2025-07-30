@@ -25,8 +25,9 @@ import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { getDoc, doc } from "firebase/firestore";
-import db from "@/firebase/firestore";
+import { getDoc, doc, updateDoc, setDoc } from "firebase/firestore";
+import { db } from "@/firebase/config";
+import { getAuth } from "firebase/auth";
 
 const languages: Language[] = ['english', 'french'];
 
@@ -102,21 +103,57 @@ export default function ContractorProfilePage() {
       }
   }, [watchProvince, form, initialProvince]);
 
+async function onSubmit(data: ProfileFormValues) {
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
 
-  function onSubmit(data: ProfileFormValues) {
-    console.log("Form Data Submitted:", data);
+  if (!currentUser) {
+    toast({
+      title: "Authentication Error",
+      description: "You must be logged in to update your profile.",
+      variant: "destructive",
+    });
+    return;
+  }
+
+  const userId = currentUser.uid;
+
+  try {
+    const userDocRef = doc(db, "users", userId); // ✅ One document per UID
+
+    await setDoc(userDocRef, {
+      name: data.name,
+      bio: data.bio ?? "",
+      city: `${data.city}`,
+      province: `${data.province}`,
+      serviceCategories: data.serviceCategories,
+      languagePreferences: data.languagePreferences ?? [],
+      licenseNumber: data.licenseNumber ?? "",
+      availability: data.availability ?? "",
+      phone: data.phone ?? "",
+      website: data.website ?? "",
+      socialLinks: {
+        facebook: data.facebook ?? "",
+        instagram: data.instagram ?? "",
+      },
+      updatedAt: new Date(),
+    }, { merge: true }); // ✅ merge: true ensures it updates, not overwrite
+
     toast({
       title: "Profile Updated",
       description: "Your contractor profile has been saved successfully.",
     });
 
-    if (data.licenseNumber && !currentContractor.isLicenseApproved) {
-      toast({
-        title: "License Information Submitted",
-        description: "Your license information will be reviewed by our team shortly.",
-      });
-    }
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    toast({
+      title: "Update Failed",
+      description: "Something went wrong while saving your profile.",
+      variant: "destructive",
+    });
   }
+}
+
 
   return (
     <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
@@ -348,16 +385,18 @@ export default function ContractorProfilePage() {
                             name="languagePreferences"
                             render={({ field }) => (
                               <FormItem key={language} className="flex flex-row items-start space-x-2 space-y-0">
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value?.includes(language)}
-                                    onCheckedChange={(checked) => {
+                               <FormControl>
+                                <Checkbox
+                                  checked={(field.value ?? []).includes(language)}
+                                  onCheckedChange={(checked) => {
+                                    const currentValues = field.value ?? [];
                                       return checked
-                                        ? field.onChange([...field.value, language])
-                                        : field.onChange(field.value?.filter(value => value !== language));
-                                    }}
-                                  />
-                                </FormControl>
+                                      ? field.onChange([...currentValues, language])
+                                      : field.onChange(currentValues.filter((value) => value !== language));
+                                  }}
+                                />
+                                 </FormControl>
+
                                 <FormLabel className="font-normal text-sm cursor-pointer capitalize">
                                   {language}
                                 </FormLabel>

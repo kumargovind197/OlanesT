@@ -11,6 +11,7 @@ import { serviceCategories, canadianProvincesAndCities } from '@/lib/data';
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
+import { getCityAndProvinceFromCoords } from '@/lib/location';
 
 export default function HomePage() {
   const { t } = useI18n();
@@ -52,37 +53,78 @@ export default function HomePage() {
 
     setSelectedCity('');
   }, [selectedProvince]); // Correctly ending the useEffect hook
+const handleLocateMe = async () => {
+  if (!navigator.geolocation) {
+    toast({
+      title: "Unsupported Feature",
+      description: "Geolocation is not supported by your browser.",
+      variant: "destructive",
+    });
+    return;
+  }
 
-  const handleLocateMe = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          // In a real app, you would use these coordinates with a reverse geocoding API
-          // to determine the city and province.
-          console.log('Latitude:', position.coords.latitude);
-          console.log('Longitude:', position.coords.longitude);
-          toast({
-            title: "Location Detected",
-            description: "This feature is for demonstration. Your coordinates are in the console.",
-          });
-        },
-        (error) => {
-          console.error('Geolocation error:', error);
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
+      const { latitude, longitude } = position.coords;
+
+      try {
+        const { city, province } = await getCityAndProvinceFromCoords(latitude, longitude);
+
+        if (!city && !province) {
           toast({
             title: "Location Error",
-            description: "Could not retrieve your location. Please ensure location services are enabled.",
+            description: "Could not detect a valid city or province.",
             variant: "destructive",
           });
+          return;
         }
-      );
-    } else {
+
+        // Normalize and match with Canadian list
+        const matchedProvince = canadianProvincesAndCities.find(
+          (p) => p.province.toLowerCase() === province.toLowerCase()
+        );
+
+        if (matchedProvince) {
+          setSelectedProvince(matchedProvince.province);
+
+          const matchedCity = matchedProvince.cities.find(
+            (c) => c.toLowerCase() === city.toLowerCase()
+          );
+
+          if (matchedCity) {
+            setSelectedCity(matchedCity);
+          } else {
+            setSelectedCity(""); // Optional: Reset if no match
+          }
+        } else {
+          setSelectedProvince(""); // Optional: Reset if no match
+        }
+
+        toast({
+          title: "Location Detected",
+          description: `Detected: ${city || "Unknown City"}, ${province || "Unknown Province"}`,
+        });
+      } catch (error) {
+        console.error("Geocoding error:", error);
+        toast({
+          title: "Location Error",
+          description: "Could not determine location from coordinates.",
+          variant: "destructive",
+        });
+      }
+    },
+    (error) => {
+      console.error("Geolocation error:", error);
       toast({
-        title: "Unsupported Feature",
-        description: "Geolocation is not supported by this browser.",
+        title: "Location Error",
+        description:
+          "Could not retrieve your location. Please ensure location services are enabled.",
         variant: "destructive",
       });
     }
-  };
+  );
+};
+
 
   const handleSearch = () => {
     if (!selectedCategory || !selectedProvince || !selectedCity) {

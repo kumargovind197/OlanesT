@@ -159,6 +159,9 @@ export const mockContractors: Contractor[] = [
     languagePreferences: ['english'],
     licenseNumber: 'ON-123456',
     isLicenseApproved: true,
+    city: 'Montreal',
+province: 'Quebec',
+
     availability: 'Mon-Fri, 9am-5pm',
     website: 'https://www.johndoerenovations.com',
     phone: '514-555-1234',
@@ -172,6 +175,9 @@ export const mockContractors: Contractor[] = [
     name: 'Jane Smith Electric',
     email: 'jane.smith.electric@example.com',
     location: 'Montreal, Quebec',
+    city: 'Montreal',
+province: 'Quebec',
+
     serviceCategories: ['General Construction'],
     bio: 'Certified master electrician providing safe and reliable electrical services. From simple repairs to full home wiring and smart home setups, I ensure every job is done to code and to the highest standard.',
     profilePictureUrl: 'https://placehold.co/200x200.png',
@@ -192,6 +198,9 @@ export const mockContractors: Contractor[] = [
     bio: 'Votre expert en plomberie à Montréal. Service rapide, fiable et courtois pour toutes urgences et installations. Nous parlons français et anglais.',
     profilePictureUrl: 'https://placehold.co/200x200.png',
     averageRating: 3,
+    city: 'Montreal',
+province: 'Quebec',
+
     reviews: mockReviews.filter(r => r.revieweeId === 'contractor3'),
     languagePreferences: ['french', 'english'],
     licenseNumber: 'QC-789123',
@@ -208,6 +217,9 @@ export const mockContractors: Contractor[] = [
     profilePictureUrl: 'https://placehold.co/200x200.png',
     averageRating: 4.8,
     reviews: [],
+    city: 'Montreal',
+province: 'Quebec',
+
     languagePreferences: ['english'],
     licenseNumber: 'AB-456789',
     isLicenseApproved: true,

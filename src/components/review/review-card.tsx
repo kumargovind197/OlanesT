@@ -3,6 +3,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { RatingStars } from '@/components/shared/rating-stars';
 import { formatDistanceToNow } from 'date-fns';
+import { db } from '@/firebase/config';
+import { useAuth } from '@/context/auth-context';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 
 interface ReviewCardProps {
   review: Review;

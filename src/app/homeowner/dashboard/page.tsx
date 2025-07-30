@@ -1,36 +1,55 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { ContractorCard } from '@/components/contractor/contractor-card';
-import type { Contractor } from '@/types';
-import { Heart, Search } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import { useEffect, useState } from "react";
+import { ContractorCard } from "@/components/contractor/contractor-card";
+import type { Contractor } from "@/types";
+import { Heart, Search, Users } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "@/firebase/config";
 
 export default function HomeownerDashboardPage() {
   const [favoriteContractors, setFavoriteContractors] = useState<Contractor[]>([]);
+  const [allContractors, setAllContractors] = useState<Contractor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Fetch favorite contractors from API
   useEffect(() => {
     const fetchFavorites = async () => {
       try {
-        setIsLoading(true);
-        // Replace with your actual API endpoint and authentication
-        const response = await fetch('/api/user/favorites');
-        if (!response.ok) {
-          throw new Error(`Error fetching favorites: ${response.statusText}`);
-        }
+        const response = await fetch("/api/user/favorites");
+        if (!response.ok) throw new Error("Failed to fetch favorites");
         const data = await response.json();
         setFavoriteContractors(data);
       } catch (error) {
         console.error("Failed to fetch favorite contractors:", error);
+      }
+    };
+
+    fetchFavorites();
+  }, []);
+
+  // Fetch all contractors from Firestore
+  useEffect(() => {
+    const fetchContractorsFromFirestore = async () => {
+      try {
+        const q = query(collection(db, "users"), where("role", "==", "contractor"));
+        const querySnapshot = await getDocs(q);
+        const contractors: Contractor[] = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Contractor[];
+        setAllContractors(contractors);
+      } catch (error) {
+        console.error("Failed to fetch contractors from Firestore:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchFavorites();
+    fetchContractorsFromFirestore();
   }, []);
 
   const renderSkeletons = () => (
@@ -53,11 +72,12 @@ export default function HomeownerDashboardPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      {/* My Favorite Contractors Section */}
       <header className="mb-8">
         <h1 className="text-3xl font-bold text-primary font-headline">My Favorite Contractors</h1>
         <p className="text-muted-foreground mt-2">Your hand-picked list of top professionals.</p>
       </header>
-      <section>
+      <section className="mb-12">
         {isLoading ? (
           renderSkeletons()
         ) : favoriteContractors.length === 0 ? (
@@ -74,6 +94,27 @@ export default function HomeownerDashboardPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {favoriteContractors.map((contractor) => (
+              <ContractorCard key={contractor.id} contractor={contractor} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* All Contractors from Firestore */}
+      <header className="mb-4">
+        <h2 className="text-2xl font-bold flex items-center gap-2 text-primary font-headline">
+          <Users className="w-6 h-6" /> All Contractors
+        </h2>
+        <p className="text-muted-foreground mt-1">Browse all verified contractors available.</p>
+      </header>
+      <section>
+        {isLoading ? (
+          renderSkeletons()
+        ) : allContractors.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground">No contractors found in Firestore.</div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {allContractors.map((contractor) => (
               <ContractorCard key={contractor.id} contractor={contractor} />
             ))}
           </div>

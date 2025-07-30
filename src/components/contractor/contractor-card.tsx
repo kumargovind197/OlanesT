@@ -1,3 +1,5 @@
+'use client';
+
 import type { Contractor } from '@/types';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -18,13 +20,21 @@ export function ContractorCard({ contractor }: ContractorCardProps) {
         <div className="flex items-center gap-4">
           <Avatar className="h-16 w-16 border">
             <AvatarImage src={contractor.profilePictureUrl} alt={contractor.name} data-ai-hint="person portrait" />
-            <AvatarFallback>{contractor.name.charAt(0)}</AvatarFallback>
+           <AvatarFallback>
+  {contractor.name?.charAt(0) || "?"}
+</AvatarFallback>
+
           </Avatar>
           <div className="flex-1">
             <h3 className="font-bold text-lg font-headline text-primary">{contractor.name}</h3>
             <div className="flex items-center gap-1 mt-1">
               <RatingStars rating={contractor.averageRating} />
-              <span className="text-xs text-muted-foreground">({contractor.reviews.length} reviews)</span>
+             {contractor?.reviews && (
+  <span className="text-xs text-muted-foreground">
+    ({contractor.reviews.length} reviews)
+  </span>
+)}
+
             </div>
             {/* Social Media Links */}
             {(contractor.socialLinks?.facebook || contractor.socialLinks?.instagram || contractor.website) && (
@@ -57,7 +67,11 @@ export function ContractorCard({ contractor }: ContractorCardProps) {
           </div>
           <div className="flex items-start gap-2">
              <Briefcase className="h-4 w-4 mt-0.5 shrink-0" />
-             <p className="line-clamp-2">{contractor.serviceCategories.slice(0, 2).join(', ')}{contractor.serviceCategories.length > 2 ? '...' : ''}</p>
+            <p className="line-clamp-2">
+  {(contractor.serviceCategories ?? []).slice(0, 2).join(', ')}
+  {(contractor.serviceCategories?.length ?? 0) > 2 ? '...' : ''}
+</p>
+
           </div>
         </div>
         <div className="mt-4">
