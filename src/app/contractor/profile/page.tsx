@@ -135,7 +135,7 @@ async function onSubmit(data: ProfileFormValues) {
       const snapshot = await uploadBytes(imageRef, data.profilePicture);
       profilePictureUrl = await getDownloadURL(snapshot.ref);
     }
-
+  const isLicenseChanged = data.licenseNumber !== currentContractor?.licenseNumber;
     const userDocRef = doc(db, "users", userId);
 
     await setDoc(userDocRef, {
@@ -145,8 +145,10 @@ async function onSubmit(data: ProfileFormValues) {
       province: `${data.province}`,
       serviceCategories: data.serviceCategories,
       languagePreferences: data.languagePreferences ?? [],
-      licenseNumber: data.licenseNumber ?? "",
+        licenseNumber: isLicenseChanged ? currentContractor?.licenseNumber ?? "" : data.licenseNumber,
       availability: data.availability ?? "",
+              licenseNumberPending: isLicenseChanged ? data.licenseNumber : null,
+
       phone: data.phone ?? "",
       website: data.website ?? "",
       socialLinks: {
@@ -157,9 +159,11 @@ async function onSubmit(data: ProfileFormValues) {
       updatedAt: new Date(),
     }, { merge: true });
 
-    toast({
+     toast({
       title: "Profile Updated",
-      description: "Your contractor profile has been saved successfully.",
+      description: isLicenseChanged
+        ? "License change submitted and awaiting admin approval."
+        : "Your contractor profile has been saved successfully.",
     });
   } catch (error) {
     console.error("Error updating profile:", error);
