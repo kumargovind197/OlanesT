@@ -28,6 +28,12 @@ import { Input } from "@/components/ui/input";
 import { getDoc, doc, updateDoc, setDoc } from "firebase/firestore";
 import { db } from "@/firebase/config";
 import { getAuth } from "firebase/auth";
+import {
+  getStorage,
+  ref as storageRef,
+  uploadBytes,
+  getDownloadURL,
+} from "firebase/storage";
 
 const languages: Language[] = ['english', 'french'];
 
@@ -35,23 +41,26 @@ const languages: Language[] = ['english', 'french'];
 const currentContractor: Contractor | undefined = mockContractors.find(c => c.id === 'contractor1');
 
 const profileFormSchema = z.object({
-  name: z.string().min(2, "Name is too short."),
-  email: z.string().email(),
-  bio: z.string().max(500, "Bio is too long.").optional(),
-  province: z.string().min(1, { message: "Please select a province." }),
-  city: z.string().min(1, { message: "Please select a city." }),
-  serviceCategories: z.array(z.string()).refine(value => value.some(item => item), {
-    message: "You have to select at least one service category.",
-  }),
-  languagePreferences: z.array(z.string()).optional(),
-  licenseNumber: z.string().min(3, "License number is required.").optional(),
-  availability: z.string().optional(),
-  profilePicture: z.any().optional().nullable(),
-  phone: z.string().optional(),
-  website: z.string().url("Invalid URL").optional().or(z.literal("")),
-  facebook: z.string().optional(),
-  instagram: z.string().optional(),
+  name: z.string().min(1, "Name is required."),
+  email: z.string().email("Invalid email").min(1, "Email is required."),
+  bio: z.string().min(1, "Bio is required."),
+  province: z.string().min(1, "Province is required."),
+  city: z.string().min(1, "City is required."),
+  serviceCategories: z.array(z.string()).min(1, "Select at least one service."),
+  languagePreferences: z.array(z.string()).min(1, "Select at least one language."),
+  licenseNumber: z.string().min(1, "License number is required."),
+  availability: z.string().min(1, "Availability is required."),
+  phone: z.string().min(1, "Phone is required."),
+  website: z.string().url("Invalid URL").min(1, "Website is required."),
+  facebook: z.string().min(1, "Facebook is required."),
+  instagram: z.string().min(1, "Instagram is required."),
+  profilePicture: z
+    .any()
+    .refine((file) => file instanceof File || typeof file === "string", {
+      message: "Profile picture is required.",
+    }),
 });
+
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
@@ -86,7 +95,7 @@ export default function ContractorProfilePage() {
       languagePreferences: currentContractor.languagePreferences || [],
       licenseNumber: currentContractor.licenseNumber || "",
       availability: currentContractor.availability || "",
-      profilePicture: null,
+      // profilePicture: null,
       phone: currentContractor.phone || "",
       website: currentContractor.website || "",
       facebook: currentContractor.socialLinks?.facebook || "",
@@ -117,9 +126,17 @@ async function onSubmit(data: ProfileFormValues) {
   }
 
   const userId = currentUser.uid;
+  let profilePictureUrl = currentContractor?.profilePictureUrl || "";
 
   try {
-    const userDocRef = doc(db, "users", userId); // ✅ One document per UID
+    if (data.profilePicture && data.profilePicture instanceof File) {
+      const storage = getStorage();
+      const imageRef = storageRef(storage, `profilePictures/${userId}/${data.profilePicture.name}`);
+      const snapshot = await uploadBytes(imageRef, data.profilePicture);
+      profilePictureUrl = await getDownloadURL(snapshot.ref);
+    }
+
+    const userDocRef = doc(db, "users", userId);
 
     await setDoc(userDocRef, {
       name: data.name,
@@ -136,14 +153,14 @@ async function onSubmit(data: ProfileFormValues) {
         facebook: data.facebook ?? "",
         instagram: data.instagram ?? "",
       },
+      profilePictureUrl: profilePictureUrl,
       updatedAt: new Date(),
-    }, { merge: true }); // ✅ merge: true ensures it updates, not overwrite
+    }, { merge: true });
 
     toast({
       title: "Profile Updated",
       description: "Your contractor profile has been saved successfully.",
     });
-
   } catch (error) {
     console.error("Error updating profile:", error);
     toast({
@@ -153,7 +170,6 @@ async function onSubmit(data: ProfileFormValues) {
     });
   }
 }
-
 
   return (
     <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
