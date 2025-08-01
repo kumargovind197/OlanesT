@@ -31,7 +31,7 @@ import { getAuth } from "firebase/auth";
 
 const languages: Language[] = ['english', 'french'];
 
-// Mock current contractor data
+// Mock current contractor data here 
 const currentContractor: Contractor | undefined = mockContractors.find(c => c.id === 'contractor1');
 
 const profileFormSchema = z.object({
