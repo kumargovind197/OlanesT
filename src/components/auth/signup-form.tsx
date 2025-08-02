@@ -59,12 +59,14 @@ export function SignupForm() {
       await user.getIdToken(true); // force refresh token
 
       // Save user data to Firestore
-      await setDoc(doc(db, "users", user.uid), {
-        fullName: data.fullName,
-        email: data.email,
-        password:data.password,
-        role: data.role,
-      });
+const targetCollection =
+  data.role === "contractor" ? "Userrolecontactor" : "Userrolehomeowner";
+
+await setDoc(doc(db, targetCollection, user.uid), {
+  fullName: data.fullName,
+  email: data.email,
+  role: data.role,
+});
 
       toast({
         title: "Signup Success",

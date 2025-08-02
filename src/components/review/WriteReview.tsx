@@ -57,7 +57,7 @@ useEffect(() => {
         let reviewerName = "Anonymous";
 
         if (reviewerId) {
-          const userDoc = await getDoc(doc(db, "users", reviewerId));
+          const userDoc = await getDoc(doc(db, "Userrolehomeowner", reviewerId));
           if (userDoc.exists()) {
              reviewerName = userDoc.data().fullName || "Anonymous";
           }

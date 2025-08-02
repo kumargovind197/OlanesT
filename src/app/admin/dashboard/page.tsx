@@ -12,16 +12,45 @@ import { format, parseISO, isValid } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 import { useI18n } from '@/context/i18n-context';
-
+import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
+import { db } from "@/firebase/config";
+import { useRouter } from 'next/navigation';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 export default function AdminLicenseApprovalPage() {
   const [applications, setApplications] = useState<LicenseApplication[]>(mockLicenseApplications);
+
+useEffect(() => {
+  async function fetchApplications() {
+    const snapshot = await getDocs(collection(db, "AdminApproveLicense"));
+    const apps = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as LicenseApplication[];
+
+    setApplications(apps);
+  }
+
+  fetchApplications();
+}, []);
   const [isClient, setIsClient] = useState(false);
   const { toast } = useToast();
   const { t } = useI18n();
+const router = useRouter();
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+useEffect(() => {
+  const auth = getAuth();
+
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
+    if (!user || user.email !== "admin123@lanest.com") {
+      // router.push("auth/login"); 
+    } else {
+      setIsClient(true); // Now show page
+    }
+  });
+
+  return () => unsubscribe(); // cleanup
+}, [router]);
+
 
   const handleApprove = (id: string) => {
     setApplications(prev => prev.map(app => app.id === id ? { ...app, status: 'approved', reviewedAt: new Date().toISOString() } : app));

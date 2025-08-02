@@ -25,7 +25,7 @@ import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { getDoc, doc, updateDoc, setDoc } from "firebase/firestore";
+import { getDoc, doc, updateDoc, setDoc, collection, addDoc } from "firebase/firestore";
 import { db } from "@/firebase/config";
 import { getAuth } from "firebase/auth";
 import {
@@ -136,7 +136,20 @@ async function onSubmit(data: ProfileFormValues) {
       profilePictureUrl = await getDownloadURL(snapshot.ref);
     }
   const isLicenseChanged = data.licenseNumber !== currentContractor?.licenseNumber;
-    const userDocRef = doc(db, "users", userId);
+  if (isLicenseChanged) {
+  await addDoc(collection(db, "AdminApproveLicense"), {
+    contractorId: userId,
+    contractorName: data.name,
+    licenseNumber: data.licenseNumber,
+    submittedAt: new Date().toISOString(),
+    status: "pending",
+    licenseDocumentUrl: "", // Add this later if you want document upload
+  });
+}
+
+
+
+    const userDocRef = doc(db, "ContractorPrfoile", userId);
 
     await setDoc(userDocRef, {
       name: data.name,
