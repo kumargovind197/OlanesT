@@ -35,7 +35,7 @@ export default function HomeownerDashboardPage() {
 useEffect(() => {
   const fetchContractorsFromFirestore = async () => {
     try {
-      const q = query(collection(db, "ContractorProfile")); // ✅ Corrected name
+      const q = query(collection(db, "ContractorPrfoile")); // ✅ Corrected name
       const querySnapshot = await getDocs(q);
 
       const contractors: Contractor[] = querySnapshot.docs.map((doc) => ({

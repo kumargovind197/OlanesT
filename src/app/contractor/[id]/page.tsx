@@ -17,7 +17,7 @@ import { db } from "@/firebase/config";
 // This function would typically fetch data from a database
 async function getContractorData(id: string): Promise<Contractor | null> {
   try {
-    const docRef = doc(db, "ContractorProfile", id);
+    const docRef = doc(db, "ContractorPrfoile", id);
     const snapshot = await getDoc(docRef);
 
     if (!snapshot.exists()) {
@@ -47,7 +47,7 @@ async function getContractorData(id: string): Promise<Contractor | null> {
       website: data.website || "",
       socialLinks: data.socialLinks || {},
     };
-
+console.log(data)
     return contractor;
   } catch (error) {
     console.error("Error fetching contractor:", error);
