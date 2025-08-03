@@ -17,7 +17,7 @@ import { db } from "@/firebase/config";
 import { useRouter } from 'next/navigation';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 export default function AdminLicenseApprovalPage() {
-  const [applications, setApplications] = useState<LicenseApplication[]>(mockLicenseApplications);
+const [applications, setApplications] = useState<LicenseApplication[]>([]);
 
 useEffect(() => {
   async function fetchApplications() {
@@ -52,15 +52,64 @@ useEffect(() => {
 }, [router]);
 
 
-  const handleApprove = (id: string) => {
-    setApplications(prev => prev.map(app => app.id === id ? { ...app, status: 'approved', reviewedAt: new Date().toISOString() } : app));
-    toast({ title: "License Approved", description: `Application for ${applications.find(a => a.id === id)?.contractorName} marked as approved.` });
-  };
+ const handleApprove = async (id: string) => {
+  const updatedAt = new Date().toISOString();
+  const updatedApps = applications.map(app =>
+    app.id === id
+      ? {
+          ...app,
+          status: "approved" as "approved", // 👈 Type assertion
+          reviewedAt: updatedAt,
+        }
+      : app
+  );
+  setApplications(updatedApps as LicenseApplication[]); // 👈 Array cast
 
-  const handleReject = (id: string) => {
-    setApplications(prev => prev.map(app => app.id === id ? { ...app, status: 'rejected', reviewedAt: new Date().toISOString(), reviewerNotes: "Rejected by admin." } : app));
-    toast({ title: "License Rejected", description: `Application for ${applications.find(a => a.id === id)?.contractorName} marked as rejected.`, variant: "destructive" });
-  };
+  try {
+    await updateDoc(doc(db, "AdminApproveLicense", id), {
+      status: "approved",
+      reviewedAt: updatedAt,
+    });
+
+    toast({
+      title: "License Approved",
+      description: `Application for ${applications.find(a => a.id === id)?.contractorName} marked as approved.`,
+    });
+  } catch (error) {
+    console.error("Error approving license:", error);
+  }
+};
+
+ const handleReject = async (id: string) => {
+  const updatedAt = new Date().toISOString();
+  const updatedApps = applications.map(app =>
+    app.id === id
+      ? {
+          ...app,
+          status: "rejected" as "rejected",
+          reviewedAt: updatedAt,
+          reviewerNotes: "Rejected by admin.",
+        }
+      : app
+  );
+  setApplications(updatedApps as LicenseApplication[]);
+
+  try {
+    await updateDoc(doc(db, "AdminApproveLicense", id), {
+      status: "rejected",
+      reviewedAt: updatedAt,
+      reviewerNotes: "Rejected by admin.",
+    });
+
+    toast({
+      title: "License Rejected",
+      description: `Application for ${applications.find(a => a.id === id)?.contractorName} marked as rejected.`,
+      variant: "destructive",
+    });
+  } catch (error) {
+    console.error("Error rejecting license:", error);
+  }
+};
 
   const formatDate = (dateString: string | undefined, includeTime = false) => {
     if (!isClient || !dateString) return '...';
