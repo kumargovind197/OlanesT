@@ -17,7 +17,7 @@ import { db } from "@/firebase/config";
 // This function would typically fetch data from a database
 async function getContractorData(id: string): Promise<Contractor | null> {
   try {
-    const docRef = doc(db, "ContractorPrfoile", id);
+    const docRef = doc(db, "ContractorProfile", id);
     const snapshot = await getDoc(docRef);
 
     if (!snapshot.exists()) {

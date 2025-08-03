@@ -32,25 +32,29 @@ export default function HomeownerDashboardPage() {
   }, []);
 
   // Fetch all contractors from Firestore
-  useEffect(() => {
-    const fetchContractorsFromFirestore = async () => {
-      try {
-        const q = query(collection(db, "users"), where("role", "==", "contractor"));
-        const querySnapshot = await getDocs(q);
-        const contractors: Contractor[] = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Contractor[];
-        setAllContractors(contractors);
-      } catch (error) {
-        console.error("Failed to fetch contractors from Firestore:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+useEffect(() => {
+  const fetchContractorsFromFirestore = async () => {
+    try {
+      const q = query(collection(db, "ContractorProfile")); // ✅ Corrected name
+      const querySnapshot = await getDocs(q);
 
-    fetchContractorsFromFirestore();
-  }, []);
+      const contractors: Contractor[] = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Contractor[];
+
+      console.log("Loaded contractors:", querySnapshot); // ✅ See if data is loading
+
+      setAllContractors(contractors);
+    } catch (error) {
+      console.error("Failed to fetch contractors from Firestore:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  fetchContractorsFromFirestore();
+}, []);
 
   const renderSkeletons = () => (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
