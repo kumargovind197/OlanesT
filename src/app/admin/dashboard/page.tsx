@@ -42,7 +42,7 @@ useEffect(() => {
 
   const unsubscribe = onAuthStateChanged(auth, (user) => {
     if (!user || user.email !== "admin123@lanest.com") {
-      router.push("@auth/login"); 
+      // router.push("@auth/login"); pah
     } else {
       setIsClient(true); // Now show page
     }
