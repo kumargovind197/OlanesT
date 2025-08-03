@@ -29,9 +29,9 @@ export default function HomeownerSearchClient() {
       setLoading(true);
 
       try {
-        const contractorsRef = collection(db, "users");
-        const q = query(contractorsRef, where("role", "==", "contractor"));
-        const snapshot = await getDocs(q);
+        const contractorsRef = collection(db, "ContractorPrfoile");
+        // const q = query(contractorsRef, where("role", "==", "contractor"));
+        const snapshot = await getDocs(contractorsRef);
 
         const allContractors: Contractor[] = snapshot.docs.map(doc => {
           const data = doc.data();
