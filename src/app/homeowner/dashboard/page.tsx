@@ -32,18 +32,62 @@ export default function HomeownerDashboardPage() {
   }, []);
 
   // Fetch all contractors from Firestore
+// useEffect(() => {
+//   const fetchContractorsFromFirestore = async () => {
+//     try {
+//       const q = query(collection(db, "ContractorPrfoile")); // ✅ Corrected name
+//       const querySnapshot = await getDocs(q);
+
+//       const contractors: Contractor[] = querySnapshot.docs.map((doc) => ({
+//         id: doc.id,
+//         ...doc.data(),
+//       })) as Contractor[];
+
+//       console.log("Loaded contractors:", querySnapshot); // ✅ See if data is loading
+
+//       setAllContractors(contractors);
+//     } catch (error) {
+//       console.error("Failed to fetch contractors from Firestore:", error);
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   fetchContractorsFromFirestore();
+// }, []);
 useEffect(() => {
   const fetchContractorsFromFirestore = async () => {
     try {
-      const q = query(collection(db, "ContractorPrfoile")); // ✅ Corrected name
-      const querySnapshot = await getDocs(q);
+      const contractorSnapshot = await getDocs(collection(db, "ContractorPrfoile"));
+      const reviewSnapshot = await getDocs(collection(db, "reviews"));
 
-      const contractors: Contractor[] = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Contractor[];
+      const allReviews = reviewSnapshot.docs.map(doc => doc.data());
 
-      console.log("Loaded contractors:", querySnapshot); // ✅ See if data is loading
+ const contractors: Contractor[] = contractorSnapshot.docs.map((doc) => {
+  const contractorData = doc.data();
+  const contractorId = doc.id;
+
+  const contractorReviews = allReviews.filter(
+    (review: any) => review.contractorId === contractorId
+  );
+
+  const totalRatings = contractorReviews.reduce(
+    (sum, review: any) => sum + (review.rating || 0),
+    0
+  );
+
+  const averageRating =
+    contractorReviews.length > 0
+      ? totalRatings / contractorReviews.length
+      : 0;
+
+  return {
+    ...(contractorData as Contractor), // ensure type safety
+    id: contractorId,
+    averageRating,
+    reviewCount: contractorReviews.length,
+  };
+});
 
       setAllContractors(contractors);
     } catch (error) {
