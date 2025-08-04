@@ -46,6 +46,18 @@ export function LoginForm() {
       const auth = getAuth(firebase_app);
       const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
       const user = userCredential.user;
+
+       if (user) {
+      // ✅ If it's the admin, redirect directly
+      if (user.email === "admin123@olanest.com") {
+        toast({
+          title: t('toast.loginSuccess'),
+          description: t('toast.loginSuccessDescription'),
+        });
+        router.push('/admin/dashboard');
+        return; // ⛔ Prevent further role-check
+      }
+    }
       
       if (user) {
         const role = await login(user);
@@ -76,6 +88,8 @@ export function LoginForm() {
       });
     }
   };
+ 
+
 
   return (
     <Form {...form}>

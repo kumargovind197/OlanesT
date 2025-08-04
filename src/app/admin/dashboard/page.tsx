@@ -41,14 +41,14 @@ useEffect(() => {
   const auth = getAuth();
 
   const unsubscribe = onAuthStateChanged(auth, (user) => {
-    if (!user || user.email !== "admin123@lanest.com") {
-      // router.push("@auth/login"); pah
+    if (!user || user.email !== "admin123@olanest.com") {
+      router.push("/auth/login"); 
     } else {
-      setIsClient(true); // Now show page
+      setIsClient(true); // ✅ Only show content if admin
     }
   });
 
-  return () => unsubscribe(); // cleanup
+  return () => unsubscribe();
 }, [router]);
 
 
