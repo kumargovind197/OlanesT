@@ -17,6 +17,7 @@ interface Translations {
 
 const translations: Translations = {
   en: {
+    
     common: {
       appName: 'OlaNest',
       loading: 'Loading...',
@@ -53,6 +54,23 @@ const translations: Translations = {
       ratingsAndReviews: "5. Ratings and Reviews",
       changesToTerms: "6. Changes to Terms",
     },
+   
+   dashboard: {
+    welcome: "Bon retour, {name} !",
+    pageTitle: "Tableau de bord de l'entrepreneur",
+    profileTitle: "Gestion du profil",
+    profileDesc: "Mettez à jour vos services, bio, disponibilités et informations de licence.",
+    reviewsTitle: "Avis et évaluations",
+    reviewsDesc: "Découvrez ce que les propriétaires disent de vos services.",
+    license: {
+      approvedTitle: "Licence approuvée",
+      approvedDesc: "Votre licence a été approuvée avec succès.",
+      rejectedTitle: "Licence rejetée",
+      rejectedDesc: "Votre licence a été rejetée. Veuillez vérifier et soumettre à nouveau.",
+      pendingTitle: "Vérification de la licence en attente",
+      pendingDesc: "Votre licence est en cours de révision. Certaines fonctionnalités peuvent être limitées.",
+    }
+  },
     navbar: {
       home: 'Home',
       messages: 'Messages',
@@ -431,7 +449,9 @@ const translations: Translations = {
       windowcoverings: 'Habillage de fenêtres',
       windowsanddoors: 'Fenêtres et portes',
     },
+    
   }
+  
 };
 
 interface I18nContextType {

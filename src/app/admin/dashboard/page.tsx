@@ -218,21 +218,28 @@ useEffect(() => {
                     <TableHead>Reviewed At</TableHead>
                   </TableRow>
                 </TableHeader>
-                <TableBody>
-                  {reviewedApplications.map(app => (
-                    <TableRow key={app.id}>
-                      <TableCell>{app.contractorName}</TableCell>
-                      <TableCell>{app.licenseNumber}</TableCell>
-                      <TableCell>
-                        <Badge variant={app.status === 'approved' ? 'default' : 'destructive'} 
-                               className={app.status === 'approved' ? 'bg-green-100 text-green-800 border-green-200' : 'bg-red-100 text-red-800 border-red-200'}>
-                          {t(`common.${app.status}`)}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{formatDate(app.reviewedAt, true)}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
+             <TableBody>
+  {reviewedApplications.map(app => (
+    <TableRow key={app.id}>
+      <TableCell>
+        <Button variant="link" asChild className="p-0 h-auto text-blue-600 hover:underline">
+          <Link href={`/contractor/${app.contractorId}`}>
+            {app.contractorName}
+          </Link>
+        </Button>
+      </TableCell>
+      <TableCell>{app.licenseNumber}</TableCell>
+      <TableCell>
+        <Badge variant={app.status === 'approved' ? 'default' : 'destructive'} 
+               className={app.status === 'approved' ? 'bg-green-100 text-green-800 border-green-200' : 'bg-red-100 text-red-800 border-red-200'}>
+          {t(`common.${app.status}`)}
+        </Badge>
+      </TableCell>
+      <TableCell>{formatDate(app.reviewedAt, true)}</TableCell>
+    </TableRow>
+  ))}
+</TableBody>
+
               </Table>
             </div>
           </CardContent>
