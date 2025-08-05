@@ -16,20 +16,20 @@ export default function HomeownerDashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   // Fetch favorite contractors from API
-  useEffect(() => {
-    const fetchFavorites = async () => {
-      try {
-        const response = await fetch("/api/user/favorites");
-        if (!response.ok) throw new Error("Failed to fetch favorites");
-        const data = await response.json();
-        setFavoriteContractors(data);
-      } catch (error) {
-        console.error("Failed to fetch favorite contractors:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchFavorites = async () => {  
+  //     try {
+  //       const response = await fetch("/api/user/favorites");
+  //       if (!response.ok) throw new Error("Failed to fetch favorites");
+  //       const data = await response.json();
+  //       setFavoriteContractors(data);
+  //     } catch (error) {
+  //       console.error("Failed to fetch favorite contractors:", error);
+  //     }
+  //   };
 
-    fetchFavorites();
-  }, []);
+  //   fetchFavorites();
+  // }, []);
 
   // Fetch all contractors from Firestore
 // useEffect(() => {
@@ -82,7 +82,7 @@ useEffect(() => {
       : 0;
 
   return {
-    ...(contractorData as Contractor), // ensure type safety 
+    ...(contractorData as Contractor), // ensure type safety
     id: contractorId,
     averageRating,
     reviewCount: contractorReviews.length,
@@ -163,8 +163,7 @@ useEffect(() => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {allContractors.map((contractor) => (
-              <ContractorCard key={contractor.id} contractor={contractor} />
-            ))}
+ <ContractorCard key={contractor.id} contractor={contractor} />            ))}
           </div>
         )}
       </section>

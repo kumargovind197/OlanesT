@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { LogOut, LayoutDashboard, Menu } from "lucide-react";
+import { ContactForm } from "./contactus";
 
 export function Navbar() {
   const { user, role, logout } = useAuth();
@@ -70,31 +71,39 @@ export function Navbar() {
             </SheetDescription>
           </SheetHeader>
           <div className="flex flex-col space-y-4 pt-6">
-            {user ? (
-              <>
-                <SheetClose asChild>
-                  <Link href={getDashboardLink()} className="flex items-center p-2 rounded-md hover:bg-accent">
-                    <LayoutDashboard className="h-4 w-4 mr-2" />
-                    {t('navbar.dashboard')}
-                  </Link>
-                </SheetClose>
-                <SheetClose asChild>
-                  <button onClick={handleLogout} className="w-full text-left flex items-center p-2 rounded-md hover:bg-accent">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>{t('navbar.logout')}</span>
-                  </button>
-                </SheetClose>
-              </>
-            ) : (
-              <>
-                <SheetClose asChild>
-                  <Link href="/auth/login" className="block p-2 rounded-md hover:bg-accent">{t('navbar.login')}</Link>
-                </SheetClose>
-                <SheetClose asChild>
-                  <Link href="/auth/signup" className="block p-2 rounded-md hover:bg-accent">{t('navbar.signUp')}</Link>
-                </SheetClose>
-              </>
-            )}
+        {user ? (
+  <>
+    <SheetClose asChild>
+      <Link href={getDashboardLink()} className="flex items-center p-2 rounded-md hover:bg-accent">
+        <LayoutDashboard className="h-4 w-4 mr-2" />
+        {t('navbar.dashboard')}
+      </Link>
+    </SheetClose>
+    <SheetClose asChild>
+      <button onClick={handleLogout} className="w-full text-left flex items-center p-2 rounded-md hover:bg-accent">
+        <LogOut className="mr-2 h-4 w-4" />
+        <span>{t('navbar.logout')}</span>
+      </button>
+    </SheetClose>
+
+   <SheetClose asChild>
+  <Link href="/contact" className="block p-2 rounded-md hover:bg-accent">
+    {t('ContactUs') || "Contact"}
+  </Link>
+</SheetClose>
+
+  </>
+) : (
+  <>
+    <SheetClose asChild>
+      <Link href="/auth/login" className="block p-2 rounded-md hover:bg-accent">{t('navbar.login')}</Link>
+    </SheetClose>
+    <SheetClose asChild>
+      <Link href="/auth/signup" className="block p-2 rounded-md hover:bg-accent">{t('navbar.signUp')}</Link>
+    </SheetClose>
+  </>
+)}
+
             <div className="pt-4 border-t">
               <LanguageSwitcher isMobile={true} />
             </div>

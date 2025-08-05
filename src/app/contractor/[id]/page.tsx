@@ -29,12 +29,12 @@ async function getContractorData(id: string): Promise<Contractor | null> {
     const contractor: Contractor = {
       id: snapshot.id,
       name: data.name || "",
-      email: data.email || "",
+      email: data.email ?? "Not Provided",
       serviceCategories: data.serviceCategories || [],
       city: data.city || "",
       province: data.province || "",
-      location: data.location || "",
-      bio: data.bio || "",
+      location: data.location ?? "Not Provided",
+       bio: data.bio || "",
       profilePictureUrl: data.profilePictureUrl || "",
       profilePictureStatus: data.profilePictureStatus || "approved",
       averageRating: data.averageRating || 0,
@@ -131,10 +131,17 @@ export default async function ContractorProfilePage({ params }: ContractorProfil
                   <Mail className="h-5 w-5 mt-0.5 text-accent shrink-0" />
                   <a href={`mailto:${contractor.email}`} className="text-muted-foreground hover:text-primary break-all">{contractor.email}</a>
                 </div>
-              <div className="flex items-start gap-3">
-                <MapPin className="h-5 w-5 mt-0.5 text-accent shrink-0" />
-                <span className="text-muted-foreground">{contractor.location}</span>
-              </div>
+            {(contractor.city || contractor.province || contractor.location) && (
+  <div className="flex items-start gap-3">
+    <MapPin className="h-5 w-5 mt-0.5 text-accent shrink-0" />
+    <span className="text-muted-foreground">
+      {[contractor.city, contractor.province, contractor.location]
+        .filter(value => value && value !== "Not Provided")
+        .join(", ")}
+    </span>
+  </div>
+)}
+
               <div className="flex items-start gap-3">
                 <Briefcase className="h-5 w-5 mt-0.5 text-accent shrink-0" />
                 <span className="text-muted-foreground">{contractor.serviceCategories.join(', ')}</span>

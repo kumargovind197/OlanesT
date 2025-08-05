@@ -18,34 +18,36 @@ export default function ContractorDashboardPage() {
  const { t } = useI18n();
   const [status, setStatus] = useState<"pending" | "approved" | "rejected" | null>(null);
   const [contractorName, setContractorName] = useState("Contractor");
+const [hasSubmittedLicense, setHasSubmittedLicense] = useState(false);
 
-  useEffect(() => {
-    const auth = getAuth();
+ useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      const contractorId = user.uid;
 
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const contractorId = user.uid;
+      const q = query(
+        collection(db, "AdminApproveLicense"),
+        where("contractorId", "==", contractorId)
+      );
 
-        const q = query(
-          collection(db, "AdminApproveLicense"),
-          where("contractorId", "==", contractorId)
-        );
+      const snapshot = await getDocs(q);
 
-        const snapshot = await getDocs(q);
-
-        if (!snapshot.empty) {
-          const data = snapshot.docs[0].data();
-          setStatus(data.status || "pending");
-          setContractorName(data.contractorName || "Contractor");
-        } else {
-          console.warn("No license found for this contractor.");
-          setStatus("pending");
-        }
+      if (!snapshot.empty) {
+        const data = snapshot.docs[0].data();
+        setHasSubmittedLicense(true); // ✅ License was submitted
+        setStatus(data.status);
+        setContractorName(data.contractorName || "Contractor");
+      } else {
+        // ❌ No license submitted — don't show any card
+        setHasSubmittedLicense(false);
+        setStatus(null); // Optionally reset status
       }
-    });
+    }
+  });
 
-    return () => unsubscribe();
-  }, []);
+  return () => unsubscribe();
+}, []);
+
 
   const renderStatusCard = () => {
     switch (status) {
@@ -103,8 +105,7 @@ export default function ContractorDashboardPage() {
         <p className="text-muted-foreground mt-2">Welcome back, {contractorName}!</p>
       </header>
 
-      {renderStatusCard()}
-
+      {hasSubmittedLicense && renderStatusCard()}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="hover:shadow-lg transition-shadow duration-300">
           <CardHeader>

@@ -61,10 +61,15 @@ export function ContractorCard({ contractor }: ContractorCardProps) {
       </CardHeader>
       <CardContent className="p-4 flex-grow flex flex-col">
         <div className="space-y-2 text-sm text-muted-foreground flex-grow">
-          <div className="flex items-start gap-2">
-            <MapPin className="h-4 w-4 mt-0.5 shrink-0" />
-            <span>{contractor.location}</span>
-          </div>
+         {(contractor.city || contractor.province) && (
+  <div className="flex items-start gap-2">
+    <MapPin className="h-4 w-4 mt-0.5 shrink-0" />
+    <p className="text-sm text-muted-foreground">
+      {contractor.city}, {contractor.province}
+    </p>
+  </div>
+)}
+
           <div className="flex items-start gap-2">
              <Briefcase className="h-4 w-4 mt-0.5 shrink-0" />
             <p className="line-clamp-2">

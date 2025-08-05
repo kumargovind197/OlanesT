@@ -29,6 +29,10 @@ export interface Contractor {
   city: string;             // ✅ ADD
   province: string;         // ✅ ADD
   location?: string;        // keep this optional if still used elsewhere
+  // location: {
+  //   city: string;
+  //   province: string;
+  // };
   serviceCategories: ServiceCategory[];
   bio?: string;
   profilePictureUrl?: string;

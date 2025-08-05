@@ -155,7 +155,11 @@ async function onSubmit(data: ProfileFormValues) {
       name: data.name,
       bio: data.bio ?? "",
       city: `${data.city}`,
+        email: data.email, // ✅ Save email
+
       province: `${data.province}`,
+        location: `${data.city}, ${data.province}`, // ✅ Save combined location
+
       serviceCategories: data.serviceCategories,
       languagePreferences: data.languagePreferences ?? [],
         licenseNumber: isLicenseChanged ? currentContractor?.licenseNumber ?? "" : data.licenseNumber,
