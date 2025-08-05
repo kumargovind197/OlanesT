@@ -82,7 +82,7 @@ useEffect(() => {
       : 0;
 
   return {
-    ...(contractorData as Contractor), // ensure type safety
+    ...(contractorData as Contractor), // ensure type safety 
     id: contractorId,
     averageRating,
     reviewCount: contractorReviews.length,
